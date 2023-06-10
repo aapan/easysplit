@@ -1,0 +1,48 @@
+version: "3.6"
+
+services:
+
+  backend:
+    container_name: easysplit
+    build: ./easysplit
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    env_file:
+      - easysplit/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mariadb
+    volumes:
+      - ./easysplit:/project
+    networks:
+      - easysplit_net
+
+  mariadb:
+    container_name: easysplit_mariadb
+    image: mariadb:10.2.8
+    # image: arm64v8/mariadb:latest
+    restart: always
+    env_file:
+      - easysplit/.env
+    ports:
+      - "3306:3306"
+    volumes:
+      - easysplit:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/my.cnf
+    networks:
+      - easysplit_net
+
+  redis:
+    container_name: easysplit_redis
+    image: redis:alpine
+    networks:
+      - easysplit_net
+
+volumes:
+  easysplit:
+
+
+networks:
+  easysplit_net:
+    driver: bridge
