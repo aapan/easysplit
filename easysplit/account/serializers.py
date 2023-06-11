@@ -1,7 +1,10 @@
+from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
     TokenRefreshSerializer,
 )
+
+from account.models import Group, Member
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -22,3 +25,22 @@ class CustomTokenRefreshSerializer(TokenRefreshSerializer):
         data["access_token"] = data.get("access")
         del data["access"]
         return data
+
+
+class GroupSerializer(ModelSerializer):
+    class Meta:
+        model = Group
+        fields = [
+            "id",
+            "name",
+            "owner",
+            "note",
+            "public_permission",
+            "primary_currency",
+        ]
+
+
+class MemberSerializer(ModelSerializer):
+    class Meta:
+        model = Member
+        fields = "__all__"

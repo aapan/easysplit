@@ -11,7 +11,8 @@ urlpatterns = [
     # admin
     path("admin/", admin.site.urls),
     # application
-    path("account/", include("account.urls")),
+    path("", include("account.urls")),
+    path("", include("record.urls")),
 ]
 
 
