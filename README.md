@@ -24,7 +24,16 @@ To deploy EasySplit locally using Docker Compose, follow these steps:
     
 2. Set the necessary environment variables in the .env file.
 
-3. Build and start the containers using the `docker-compose-local.yml` file:
+3. (Optional) If you are using Apple M1 or iOS with the Apple M2 chip, you may need to modify the mariadb image version in the docker-compose-local.yml file. Comment out the existing image line and uncomment the image line for the appropriate version for your architecture:
+
+```yaml
+mariadb:
+    # image: mariadb:11.0.2
+    image: arm64v8/mariadb:11.0.2
+```
+
+
+4. Build and start the containers using the `docker-compose-local.yml` file:
 
 ```shell
 docker-compose -f docker-compose-local.yml up -d
