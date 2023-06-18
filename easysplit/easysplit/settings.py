@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "drf_yasg",
+    "django_simple_third_party_jwt",
     "account",
     "record",
 ]
@@ -187,3 +188,14 @@ if not DEBUG:
         level="ERROR",
         enqueue=True,
     )
+
+
+# Google login
+SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
+# SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+SOCIAL_GOOGLE_CLIENT_ID = (
+    "597901450883-56rtoveca9cqdvqir3i4omvssqkph5mm.apps.googleusercontent.com"
+)
+LOGIN_REDIRECT_URL = "/"
+VALID_REGISTER_DOMAINS = ["gmail.com"]

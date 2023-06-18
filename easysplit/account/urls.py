@@ -17,6 +17,7 @@ urlpatterns = [
         name="token_refresh",
     ),
     path("account/token/verify", TokenVerifyView.as_view(), name="token_verify"),
+    path("account/google/", include("django_simple_third_party_jwt.urls")),
     path("", include(router.urls)),
     path("group/<uuid:group_id>/members", views.MembersView.as_view(), name="members"),
 ]
