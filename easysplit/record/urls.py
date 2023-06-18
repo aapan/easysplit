@@ -8,5 +8,5 @@ router.register("record", views.RecordViewSet, basename="record")
 
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("group/<uuid:group_id>/", include(router.urls)),
 ]

@@ -2,6 +2,8 @@ from typing import List
 
 from django.db import transaction
 from django.db.models import QuerySet
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,51 +23,73 @@ from account.serializers import (
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Custom token obtain pair view.
-
-    This view extends the default TokenObtainPairView provided by the `rest_framework_simplejwt`
-    package and uses the custom serializer `CustomTokenObtainPairSerializer` for token retrieval.
-
-    Example usage:
-    POST /api/token/obtain/
-    {
-        "username": "john",
-        "password": "password123"
-    }
     """
 
     serializer_class = CustomTokenObtainPairSerializer
+
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY4NzA4MTYwOCwiaWF0IjoxNjg2OTk1MjA4LCJqdGkiOiJlOGVmNWY3ZWMxNGE0YWY0YmY3ODdiYzc0ZDU3YzMyYSIsInVzZXJfaWQiOjF9.Gn5tQI6OB5QL9J5NrxFGdat35wQROVMBYHjIb7YEKfc",
+                        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                        "username": "admin",
+                    }
+                },
+            )
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "username": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Username"
+                ),
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Password"
+                ),
+            },
+        ),
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class CustomTokenRefreshView(TokenRefreshView):
     """
     Custom token refresh view.
-
-    This view extends the default TokenRefreshView provided by the `rest_framework_simplejwt`
-    package and uses the custom serializer `CustomTokenRefreshSerializer` for token refreshing.
-
-    Example usage:
-    POST /api/token/refresh/
-    {
-        "refresh": "refresh_token_here"
-    }
     """
 
     serializer_class = CustomTokenRefreshSerializer
+
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                    }
+                },
+            )
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "refresh": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Refresh token"
+                ),
+            },
+        ),
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class GroupViewSet(ModelViewSet):
     """
     API endpoint for managing groups.
-
-    This viewset provides CRUD functionality for the `Group` model. It uses the `GroupSerializer`
-    for serialization and supports authenticated requests only (IsAuthenticated permission).
-
-    Example usage:
-    GET /api/groups/ - Retrieve all groups
-    POST /api/groups/ - Create a new group
-    GET /api/groups/{id}/ - Retrieve a specific group
-    PUT /api/groups/{id}/ - Update a specific group
-    DELETE /api/groups/{id}/ - Delete a specific group
     """
 
     queryset = Group.objects.all()
@@ -84,6 +108,12 @@ class GroupViewSet(ModelViewSet):
         """
         queryset = Group.objects.filter(members__in=[self.request.user.id])
         return queryset
+
+    @swagger_auto_schema(
+        operation_description="Return groups that the authenticated user is a member of."
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class MembersView(APIView):
@@ -170,6 +200,27 @@ class MembersView(APIView):
         delete_list = post_data["delete"]
         Member.objects.filter(id__in=delete_list).delete()
 
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": [
+                        {
+                            "id": "579ca85c-dab2-44b3-a01b-eb49ef77a463",
+                            "balances": [],
+                            "created_at": "2023-06-18T09:23:04.668668+08:00",
+                            "updated_at": "2023-06-18T09:23:04.668676+08:00",
+                            "name": "User1",
+                            "permission": "view",
+                            "user": None,
+                            "group": "aff6e4b8-ec21-4cc8-b7ed-c5e9ea12c76b",
+                        }
+                    ]
+                },
+            )
+        },
+    )
     def get(self, request, *args, **kwargs):
         """
         Retrieve and return the members of a group.
@@ -195,7 +246,86 @@ class MembersView(APIView):
         )
         return Response(member_serializer.data)
 
-    # key required ["create", "update", "delete"]
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": [
+                        {
+                            "id": "579ca85c-dab2-44b3-a01b-eb49ef77a463",
+                            "balances": [],
+                            "created_at": "2023-06-18T09:23:04.668668+08:00",
+                            "updated_at": "2023-06-18T09:23:04.668676+08:00",
+                            "name": "User1",
+                            "permission": "view",
+                            "user": None,
+                            "group": "aff6e4b8-ec21-4cc8-b7ed-c5e9ea12c76b",
+                        }
+                    ]
+                },
+            )
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "create": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    description="Create user list",
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "user_id": openapi.Schema(
+                                type=openapi.TYPE_INTEGER, example=None
+                            ),
+                            "name": openapi.Schema(
+                                type=openapi.TYPE_STRING, example="User1"
+                            ),
+                            "permission": openapi.Schema(
+                                type=openapi.TYPE_STRING, example="view"
+                            ),
+                        },
+                    ),
+                ),
+                "update": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    description="Update user list",
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "id": openapi.Schema(
+                                type=openapi.TYPE_STRING,
+                                example="579ca85c-dab2-44b3-a01b-eb49ef77a463",
+                            ),
+                            "user_id": openapi.Schema(
+                                type=openapi.TYPE_INTEGER, example=None
+                            ),
+                            "name": openapi.Schema(
+                                type=openapi.TYPE_STRING, example="User1"
+                            ),
+                            "permission": openapi.Schema(
+                                type=openapi.TYPE_STRING, example="view"
+                            ),
+                        },
+                    ),
+                ),
+                "delete": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    description="Delete user list",
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "id": openapi.Schema(
+                                type=openapi.TYPE_STRING,
+                                example="579ca85c-dab2-44b3-a01b-eb49ef77a463",
+                            ),
+                        },
+                    ),
+                ),
+            },
+            required=["create", "update", "delete"],
+        ),
+    )
     def post(self, requset, *args, **kwargs):
         """
         Update and return the members of a group based on the provided data.

@@ -5,10 +5,24 @@ from rest_framework_simplejwt.serializers import (
 )
 
 from account.models import Group, Member
+from record.serializers import BalanceSerializer
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Custom token obtain pair serializer.
+    """
+
     def validate(self, attrs):
+        """
+        Validate the token obtain request and return the serialized data.
+
+        Args:
+            attrs (dict): The request data.
+
+        Returns:
+            dict: The serialized data containing the access token, refresh token, and username.
+        """
         data = super().validate(attrs)
         refresh = self.get_token(self.user)
         data["refresh_token"] = str(refresh)
@@ -20,7 +34,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    """
+    Custom token refresh serializer.
+    """
+
     def validate(self, attrs):
+        """
+        Validate the token refresh request and return the serialized data.
+
+        Args:
+            attrs (dict): The request data.
+
+        Returns:
+            dict: The serialized data containing the access token.
+        """
         data = super().validate(attrs)
         data["access_token"] = data.get("access")
         del data["access"]
@@ -28,6 +55,10 @@ class CustomTokenRefreshSerializer(TokenRefreshSerializer):
 
 
 class GroupSerializer(ModelSerializer):
+    """
+    Serializer for the Group model.
+    """
+
     class Meta:
         model = Group
         fields = [
@@ -41,6 +72,12 @@ class GroupSerializer(ModelSerializer):
 
 
 class MemberSerializer(ModelSerializer):
+    """
+    Serializer for the Member model.
+    """
+
+    balances = BalanceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Member
         fields = "__all__"
