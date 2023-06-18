@@ -6,7 +6,7 @@ services:
     build: ./nginx
     restart: always
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     depends_on:
       - backend
     volumes:
