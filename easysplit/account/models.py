@@ -5,6 +5,10 @@ from common.models import CURRENCY_CHOICES, BasicModelMixin
 
 
 class Group(BasicModelMixin):
+    """
+    Model representing a group.
+    """
+    
     PUBLIC_PERMISSION_CHOICES = [
         ("limited", "limited"),
         ("public", "public"),
@@ -24,6 +28,10 @@ class Group(BasicModelMixin):
 
 
 class Member(BasicModelMixin):
+    """
+    Model representing a member of a group.
+    """
+
     PERMISSION_CHOICES = [
         ("edit", "edit"),
         ("view", "view"),

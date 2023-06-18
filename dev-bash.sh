@@ -1,3 +1,3 @@
 #!/bin/bash
-export `cat ./easysplit/.env`
+export `cat ./.env`
 docker exec -it $PROJECT_NAME bash
