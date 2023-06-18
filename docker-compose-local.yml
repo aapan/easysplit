@@ -4,11 +4,11 @@ services:
 
   backend:
     container_name: easysplit
-    build: ./easysplit
+    build: .
     command: python manage.py runserver 0.0.0.0:8000
     restart: always
     env_file:
-      - easysplit/.env
+      - .env
     ports:
       - "8000:8000"
     depends_on:
@@ -20,11 +20,11 @@ services:
 
   mariadb:
     container_name: easysplit_mariadb
-    image: mariadb:10.2.8
-    # image: arm64v8/mariadb:latest
+    image: mariadb:11.0.2
+    # image: arm64v8/mariadb:11.0.2
     restart: always
     env_file:
-      - easysplit/.env
+      - .env
     ports:
       - "3306:3306"
     volumes:
