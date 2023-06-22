@@ -157,6 +157,22 @@ class UserView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "id": 0,
+                        "username": "string",
+                        "email": "string",
+                        "first_name": "string",
+                        "last_name": "string",
+                    }
+                },
+            )
+        },
+    )
     def get(self, request, *args, **kwargs):
         """
         Get the logged-in user's data.
