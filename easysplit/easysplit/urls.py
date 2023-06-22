@@ -5,7 +5,7 @@ from django.urls import include, path, re_path
 from django.views import static
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny
 
 urlpatterns = [
     # admin

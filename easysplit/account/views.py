@@ -2,6 +2,7 @@ from typing import List
 
 from django.db import transaction
 from django.db.models import QuerySet
+from django_simple_third_party_jwt.views import GoogleLogin
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -9,7 +10,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 from account.models import Group, Member
 from account.serializers import (
@@ -22,7 +27,8 @@ from account.serializers import (
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
-    Custom token obtain pair view.
+    Takes a set of user credentials and returns an access and refresh JSON web
+    token pair to prove the authentication of those credentials.
     """
 
     serializer_class = CustomTokenObtainPairSerializer
@@ -58,7 +64,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     """
-    Custom token refresh view.
+    Takes a refresh type JSON web token and returns an access type JSON web
+    token if the refresh token is valid.
     """
 
     serializer_class = CustomTokenRefreshSerializer
@@ -85,6 +92,95 @@ class CustomTokenRefreshView(TokenRefreshView):
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+
+class CustomTokenVerifyView(TokenVerifyView):
+    """
+    Takes a token and indicates if it is valid.  This view provides no
+    information about a token's fitness for a particular use.
+    """
+
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={"application/json": {}},
+            )
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "token": openapi.Schema(type=openapi.TYPE_STRING, description=""),
+            },
+        ),
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class CustomGoogleLoginView(GoogleLogin):
+    """
+    API endpoint for Google 3rd part login.
+    """
+
+    @swagger_auto_schema(
+        responses={
+            "200": openapi.Response(
+                description="",
+                examples={
+                    "application/json": {
+                        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                        "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                        "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                        "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg2OTk1NTA4LCJpYXQiOjE2ODY5OTUyMDgsImp0aSI6ImE2NDNkNWNkYWU2ZTRmMjNhNmU3Y2ViNDdlZmI5MjQ0IiwidXNlcl9pZCI6MX0.zWoiY4AOQWOdGL3afX82afBkdPhGx4NxPjRyTD9QnkM",
+                    }
+                },
+            )
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "credential": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Google login credential"
+                ),
+            },
+        ),
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class UserView(APIView):
+    """
+    API endpoint for retrieving the logged-in user's data.
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        """
+        Get the logged-in user's data.
+
+        Args:
+            request (HttpRequest): The HTTP request object containing user authentication.
+
+        Returns:
+            Response: A JSON response containing the user's data.
+                - id (int): The user's ID.
+                - username (str): The user's username.
+                - email (str): The user's email address.
+                - first_name (str): The user's first name.
+                - last_name (str): The user's last name.
+        """
+        return Response(
+            {
+                "id": request.user.id,
+                "username": request.user.username,
+                "email": request.user.email,
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+            }
+        )
 
 
 class GroupViewSet(ModelViewSet):
@@ -120,6 +216,8 @@ class MembersView(APIView):
     """
     This view handles the retrieval and updating of members for a specific group.
     """
+
+    permission_classes = (IsAuthenticated,)
 
     @staticmethod
     def check_post_data(group: Group, post_data: dict) -> tuple:
