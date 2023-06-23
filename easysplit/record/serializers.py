@@ -95,7 +95,7 @@ class RecordSerializer(ModelSerializer):
             )[
                 "total_amount"
             ]
-            balance.balance = balance.balance + total_expense + total_income
+            balance.balance = total_expense + total_income
             balance.save()
 
     def create(self, validated_data):
@@ -150,37 +150,13 @@ class RecordSerializer(ModelSerializer):
         )
         instance.save()
 
-        # Update or create 'From' objects
-        existing_from_ids = []
+        From.objects.filter(record=instance).delete()
+        To.objects.filter(record=instance).delete()
+
         for from_item in from_data:
-            from_id = from_item.get("id")
-            if from_id:
-                existing_from_ids.append(from_id)
-                from_instance = From.objects.get(id=from_id, record=instance)
-                from_instance.member = from_item.get("member", from_instance.member)
-                from_instance.amount = from_item.get("amount", from_instance.amount)
-                from_instance.save()
-            else:
-                From.objects.create(record=instance, **from_item)
-
-        # Delete removed 'From' objects
-        From.objects.filter(record=instance).exclude(id__in=existing_from_ids).delete()
-
-        # Update or create 'To' objects
-        existing_to_ids = []
+            From.objects.create(record=instance, **from_item)
         for to_item in to_data:
-            to_id = to_item.get("id")
-            if to_id:
-                existing_to_ids.append(to_id)
-                to_instance = To.objects.get(id=to_id, record=instance)
-                to_instance.member = to_item.get("member", to_instance.member)
-                to_instance.amount = to_item.get("amount", to_instance.amount)
-                to_instance.save()
-            else:
-                To.objects.create(record=instance, **to_item)
-
-        # Delete removed 'To' objects
-        To.objects.filter(record=instance).exclude(id__in=existing_to_ids).delete()
+            To.objects.create(record=instance, **to_item)
 
         self.update_members_balance(instance)
 
@@ -196,11 +172,9 @@ class RecordSerializer(ModelSerializer):
         Returns:
             None
         """
-        # Delete 'From' objects
         From.objects.filter(record=instance).delete()
-
-        # Delete 'To' objects
         To.objects.filter(record=instance).delete()
 
-        # Delete 'Record' object
+        self.update_members_balance(instance)
+
         instance.delete()

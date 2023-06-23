@@ -24,3 +24,7 @@ class RecordViewSet(ModelViewSet):
         if group_id:
             queryset = Record.objects.filter(group__id=group_id)
         return queryset
+
+    def perform_destroy(self, instance):
+        serializer = self.get_serializer()
+        serializer.delete(instance)
