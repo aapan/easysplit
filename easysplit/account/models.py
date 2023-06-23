@@ -8,7 +8,7 @@ class Group(BasicModelMixin):
     """
     Model representing a group.
     """
-    
+
     PUBLIC_PERMISSION_CHOICES = [
         ("limited", "limited"),
         ("public", "public"),
@@ -25,6 +25,9 @@ class Group(BasicModelMixin):
         default="TWD", max_length=10, choices=CURRENCY_CHOICES
     )
     # image = models.ImageField()
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class Member(BasicModelMixin):
@@ -43,3 +46,6 @@ class Member(BasicModelMixin):
     name = models.CharField(max_length=50)
     permission = models.CharField(max_length=20, choices=PERMISSION_CHOICES)
     # primary_balance
+
+    class Meta:
+        ordering = ["created_at"]

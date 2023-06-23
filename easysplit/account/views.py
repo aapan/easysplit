@@ -218,7 +218,7 @@ class GroupViewSet(ModelViewSet):
         Example usage:
             GET /api/groups/
         """
-        queryset = Group.objects.filter(members__in=[self.request.user.id])
+        queryset = Group.objects.filter(members__user=self.request.user)
         return queryset
 
     @swagger_auto_schema(
@@ -236,12 +236,12 @@ class MembersView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @staticmethod
-    def check_post_data(group: Group, post_data: dict) -> tuple:
+    def validate_post_data(group: Group, post_data: dict) -> tuple:
         """
-        Check if the provided post_data is valid or not for the given Group.
+        Validate if the provided post_data is valid or not for the given Group.
 
         Args:
-            group (Group): The Group instance to check against.
+            group (Group): The Group instance to validate against.
             post_data (dict): The data received in the POST request.
 
         Returns:
@@ -249,7 +249,7 @@ class MembersView(APIView):
                             and an error message (if any).
 
         Note:
-            This function checks if the provided post_data contains any invalid updates or deletions
+            This function validates if the provided post_data contains any invalid updates or deletions
             related to the group's owner member.
 
             - If an update is attempted on the group owner, it is considered invalid.
@@ -261,7 +261,7 @@ class MembersView(APIView):
         if group.members.filter(user=group.owner).exists():
             owner_member = group.members.get(user=group.owner)
             update_members_id = [item["id"] for item in post_data["update"]]
-            delete_members_id = {id for id in post_data["delete"]}
+            delete_members_id = {item["id"] for item in post_data["delete"]}
             if str(owner_member.id) in update_members_id:
                 is_valid = False
                 error_msg = "Can't update group owner"
@@ -312,7 +312,7 @@ class MembersView(APIView):
         Member.objects.bulk_update(update_objs, fields=["user", "name", "permission"])
 
         delete_list = post_data["delete"]
-        Member.objects.filter(id__in=delete_list).delete()
+        Member.objects.filter(id__in=[item["id"] for item in delete_list]).delete()
 
     @swagger_auto_schema(
         responses={
@@ -462,7 +462,7 @@ class MembersView(APIView):
             return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         post_data = requset.data
 
-        is_valid, error_msg = self.check_post_data(group, post_data)
+        is_valid, error_msg = self.validate_post_data(group, post_data)
         if not is_valid:
             return Response({"detail": error_msg}, status=status.HTTP_403_FORBIDDEN)
         self.update_data(group.id, post_data)
