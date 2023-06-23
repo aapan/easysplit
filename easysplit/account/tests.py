@@ -8,6 +8,10 @@ from common.tests import BaseTestCase, incorrect_format_message
 
 
 class UserDataModel(BaseModel):
+    """
+    Represents the data model for user data.
+    """
+
     id: int
     username: str
     email: str
@@ -16,6 +20,10 @@ class UserDataModel(BaseModel):
 
 
 class AccountTests(BaseTestCase):
+    """
+    Test case class for account-related tests.
+    """
+
     def test_user_login(self):
         """
         Test user login.
@@ -38,6 +46,10 @@ class AccountTests(BaseTestCase):
 
 
 class GroupDataModel(BaseModel):
+    """
+    Represents the data model for group data.
+    """
+
     id: str
     name: str
     owner: int
@@ -47,6 +59,10 @@ class GroupDataModel(BaseModel):
 
 
 class GroupTests(BaseTestCase):
+    """
+    Test case class for group-related tests.
+    """
+
     def test_retrieve_group(self):
         """
         Test retrieving group.
@@ -125,6 +141,10 @@ class GroupTests(BaseTestCase):
 
 
 class MemberDataModel(BaseModel):
+    """
+    Represents the data model for member data.
+    """
+
     id: str
     balances: list
     created_at: str
@@ -136,6 +156,10 @@ class MemberDataModel(BaseModel):
 
 
 class MemberTests(BaseTestCase):
+    """
+    Test case class for member-related tests.
+    """
+
     def test_list_member(self):
         """
         Test listing members.
