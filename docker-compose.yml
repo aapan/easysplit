@@ -17,7 +17,7 @@ services:
 
   backend:
     container_name: easysplit
-    build: ./easysplit
+    build: .
     command: ./docker-entrypoint.sh
     restart: always
     env_file:
