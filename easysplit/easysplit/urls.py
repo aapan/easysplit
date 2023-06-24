@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path, re_path
 from django.views import static
+from django.views.generic.base import TemplateView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
@@ -13,6 +14,7 @@ urlpatterns = [
     # application
     path("", include("account.urls")),
     path("", include("record.urls")),
+    path("google-login", TemplateView.as_view(template_name="index.html")),
 ]
 
 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<head>
+    <meta name="google-signin-scope" content="profile email" />
+    <meta name="google-signin-client_id" content="597901450883-56rtoveca9cqdvqir3i4omvssqkph5mm.apps.googleusercontent.com" />
+    <script src="https://accounts.google.com/gsi/client"></script>
+</head>
+
+<body>
+    <li>
+        <div id="g_id_onload"
+                data-client_id="597901450883-56rtoveca9cqdvqir3i4omvssqkph5mm.apps.googleusercontent.com"
+                data-callback="get_jwt_using_google_credential"</div>
+        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+        </div>
+    </li>
+    <script>
+        function get_jwt_using_google_credential(data) {
+          console.log(data.credential);
+          const google_token_url = "/account/google/token";
+          // const google_token_url = "/api/auth/google/token/session"; <------ if you also need login as session, choose this one.
+          const credential = data.credential;
+          $.ajax({
+            method: "POST",
+            url: google_token_url,
+            data: { credential: credential },
+          }).done(function (data) {
+            const access_token = data.access;
+            const refresh_token = data.refresh_token;
+            localStorage.setItem("access", access_token);
+            localStorage.setItem("refresh", refresh_token);
+            console.log("Google Login");
+            $.ajax({
+              type: "POST",
+              url: "/api/auth/token/verify",
+              data: { token: access_token },
+              headers: {
+                Authorization: "Bearer" + " " + access_token,
+              },
+              success: function (data) {
+                var json_string = JSON.stringify(data, null, 2);
+                if (json_string) {
+                  console.log("Token verified successfully!");
+                }
+              },
+              error: function (data) {
+                var result = "please login " + data.responseText;
+                console.log(result);
+              },
+            });
+          });
+        }
+      </script>
+</body>
