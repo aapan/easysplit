@@ -1,7 +1,7 @@
 from typing import List
 
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django_simple_third_party_jwt.views import GoogleLogin
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -218,7 +218,9 @@ class GroupViewSet(ModelViewSet):
         Example usage:
             GET /api/groups/
         """
-        queryset = Group.objects.filter(members__user=self.request.user)
+        queryset = self.queryset.filter(
+            Q(members__user=self.request.user) | Q(owner=self.request.user)
+        ).distinct()
         return queryset
 
     @swagger_auto_schema(
