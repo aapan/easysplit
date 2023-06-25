@@ -194,8 +194,6 @@ if not DEBUG:
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
 # SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-SOCIAL_GOOGLE_CLIENT_ID = (
-    "597901450883-56rtoveca9cqdvqir3i4omvssqkph5mm.apps.googleusercontent.com"
-)
+SOCIAL_GOOGLE_CLIENT_ID = os.environ.get("SOCIAL_GOOGLE_CLIENT_ID")
 LOGIN_REDIRECT_URL = "/"
 VALID_REGISTER_DOMAINS = ["gmail.com"]
