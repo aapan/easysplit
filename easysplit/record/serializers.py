@@ -1,7 +1,8 @@
 from django.db.models import FloatField, Sum, Value
 from django.db.models.functions import Coalesce
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
+from account.models import Group, Member
 from record.models import Balance, From, Record, To
 
 
@@ -10,9 +11,11 @@ class BalanceSerializer(ModelSerializer):
     Serializer for the Balance model.
     """
 
+    member_id = PrimaryKeyRelatedField(queryset=Member.objects.all(), source="member")
+
     class Meta:
         model = Balance
-        fields = ["member", "balance", "currency"]
+        fields = ["member_id", "balance", "currency"]
 
 
 class FromSerializer(ModelSerializer):
@@ -20,9 +23,11 @@ class FromSerializer(ModelSerializer):
     Serializer for the From model.
     """
 
+    member_id = PrimaryKeyRelatedField(queryset=Member.objects.all(), source="member")
+
     class Meta:
         model = From
-        fields = ["member", "amount"]
+        fields = ["member_id", "amount"]
 
 
 class ToSerializer(ModelSerializer):
@@ -30,9 +35,11 @@ class ToSerializer(ModelSerializer):
     Serializer for the To model.
     """
 
+    member_id = PrimaryKeyRelatedField(queryset=Member.objects.all(), source="member")
+
     class Meta:
         model = To
-        fields = ["member", "amount"]
+        fields = ["member_id", "amount"]
 
 
 class RecordSerializer(ModelSerializer):
@@ -42,12 +49,13 @@ class RecordSerializer(ModelSerializer):
 
     from_members = FromSerializer(many=True)
     to_members = ToSerializer(many=True)
+    group_id = PrimaryKeyRelatedField(queryset=Group.objects.all(), source="group")
 
     class Meta:
         model = Record
         fields = [
             "id",
-            "group",
+            "group_id",
             "what",
             "amount",
             "type",

@@ -375,8 +375,8 @@ class MembersView(APIView):
                             "updated_at": "2023-06-18T09:23:04.668676+08:00",
                             "name": "User1",
                             "permission": "view",
-                            "user": None,
-                            "group": "aff6e4b8-ec21-4cc8-b7ed-c5e9ea12c76b",
+                            "user_id": None,
+                            "group_id": "aff6e4b8-ec21-4cc8-b7ed-c5e9ea12c76b",
                         }
                     ]
                 },

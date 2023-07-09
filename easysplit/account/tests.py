@@ -151,9 +151,8 @@ class MemberDataModel(BaseModel):
     updated_at: str
     name: str
     permission: str
-    user: Optional[int]
-    group: str
-
+    user_id: Optional[int]
+    group_id: str
 
 class MemberTests(BaseTestCase):
     """

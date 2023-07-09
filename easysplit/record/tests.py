@@ -13,7 +13,7 @@ class ItemDataModel(BaseModel):
     Represents the data model for from and to data.
     """
 
-    member: str
+    member_id: str
     amount: float
 
 
@@ -23,7 +23,7 @@ class RecordDataModel(BaseModel):
     """
 
     id: str
-    group: str
+    group_id: str
     what: str
     amount: float
     type: str
@@ -141,7 +141,7 @@ class RecordTests(BaseTestCase):
         Test creating record.
         """
         record_data = {
-            "group": self.default_group.id,
+            "group_id": self.default_group.id,
             "what": "Second record",
             "amount": 600,
             "type": "expense",
@@ -150,12 +150,12 @@ class RecordTests(BaseTestCase):
             "note": "",
             "is_equal_split": True,
             "from_members": [
-                {"amount": 600, "member": self.owner_member.id},
+                {"amount": 600, "member_id": self.owner_member.id},
             ],
             "to_members": [
-                {"amount": -200, "member": self.owner_member.id},
-                {"amount": -200, "member": self.binded_member.id},
-                {"amount": -200, "member": self.non_binded_member.id},
+                {"amount": -200, "member_id": self.owner_member.id},
+                {"amount": -200, "member_id": self.binded_member.id},
+                {"amount": -200, "member_id": self.non_binded_member.id},
             ],
         }
         response = self.client.post(
@@ -193,12 +193,12 @@ class RecordTests(BaseTestCase):
         record_data = {
             "amount": 600,
             "from_members": [
-                {"amount": 600, "member": self.owner_member.id},
+                {"amount": 600, "member_id": self.owner_member.id},
             ],
             "to_members": [
-                {"amount": -200, "member": self.owner_member.id},
-                {"amount": -200, "member": self.binded_member.id},
-                {"amount": -200, "member": self.non_binded_member.id},
+                {"amount": -200, "member_id": self.owner_member.id},
+                {"amount": -200, "member_id": self.binded_member.id},
+                {"amount": -200, "member_id": self.non_binded_member.id},
             ],
         }
         response = self.client.patch(

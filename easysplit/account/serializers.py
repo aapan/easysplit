@@ -1,4 +1,5 @@
-from rest_framework.serializers import ModelSerializer
+from django.contrib.auth.models import User
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
     TokenRefreshSerializer,
@@ -77,6 +78,10 @@ class MemberSerializer(ModelSerializer):
     """
 
     balances = BalanceSerializer(many=True, read_only=True)
+    user_id = PrimaryKeyRelatedField(
+        allow_null=True, queryset=User.objects.all(), required=False, source="user"
+    )
+    group_id = PrimaryKeyRelatedField(queryset=Group.objects.all(), source="group")
 
     class Meta:
         model = Member

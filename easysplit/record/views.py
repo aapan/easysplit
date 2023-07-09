@@ -22,7 +22,7 @@ class RecordViewSet(ModelViewSet):
         queryset = self.queryset
         group_id = self.request.query_params.get("group_id")
         if group_id:
-            queryset = Record.objects.filter(group__id=group_id)
+            queryset = Record.objects.filter(group_id=group_id)
         return queryset
 
     def perform_destroy(self, instance):
