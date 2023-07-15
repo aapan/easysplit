@@ -60,6 +60,16 @@ class GroupSerializer(ModelSerializer):
     Serializer for the Group model.
     """
 
+    def create(self, validated_data):
+        obj = super().create(validated_data)
+
+        # Create owner member after create group.
+        Member.objects.create(
+            user=obj.owner, group=obj, name=obj.owner.username, permission="edit"
+        )
+
+        return obj
+
     class Meta:
         model = Group
         fields = [

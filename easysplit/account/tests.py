@@ -113,6 +113,15 @@ class GroupTests(BaseTestCase):
         except ValidationError as e:
             self.fail(incorrect_format_message(e))
 
+        response = self.client.get(
+            reverse("members", kwargs={"group_id": group_data.id})
+        )
+        try:
+            data = response.json()
+            member_data = MemberDataModel(**data[0])
+        except ValidationError as e:
+            self.fail(incorrect_format_message(e))
+
     def test_update_group(self):
         """
         Test updating group.
@@ -153,6 +162,7 @@ class MemberDataModel(BaseModel):
     permission: str
     user_id: Optional[int]
     group_id: str
+
 
 class MemberTests(BaseTestCase):
     """
