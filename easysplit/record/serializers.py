@@ -11,11 +11,9 @@ class BalanceSerializer(ModelSerializer):
     Serializer for the Balance model.
     """
 
-    member_id = PrimaryKeyRelatedField(queryset=Member.objects.all(), source="member")
-
     class Meta:
         model = Balance
-        fields = ["member_id", "balance", "currency"]
+        fields = ["balance", "currency"]
 
 
 class FromSerializer(ModelSerializer):
