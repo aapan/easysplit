@@ -20,7 +20,7 @@ class RecordViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        group_id = self.request.query_params.get("group_id")
+        group_id = self.kwargs.get("group_id")
         if group_id:
             queryset = Record.objects.filter(group_id=group_id)
         return queryset
