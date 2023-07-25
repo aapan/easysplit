@@ -24,6 +24,10 @@ To deploy EasySplit locally using Docker Compose, follow these steps:
     
 2. Set the necessary environment variables in the .env file.
 
+```shell
+cp .env.example .env
+```
+
 3. (Optional) If you are using Apple M1 or iOS with the Apple M2 chip, you may need to modify the mariadb image version in the docker-compose-local.yml file. Comment out the existing image line and uncomment the image line for the appropriate version for your architecture:
 
 ```yaml
@@ -32,14 +36,21 @@ mariadb:
     image: arm64v8/mariadb:11.0.2
 ```
 
-
 4. Build and start the containers using the `docker-compose-local.yml` file:
 
 ```shell
 docker-compose -f docker-compose-local.yml up -d
 ```
 
-Access the application at http://localhost:8000.
+5. Migrate the database and create a superuser when building the project for the first time.:
+
+```shell
+docker exec -it easysplit python manage.py migrate
+
+docker exec -it easysplit python manage.py createsuperuser
+```
+
+Now, you can login and see the swagger document on: http://localhost:8000/__hiddenswagger.
 
 ## Production Deployment
 
@@ -53,6 +64,14 @@ To deploy EasySplit in a production environment using Docker Compose, follow the
 
 ```shell
 docker-compose up -d
+```
+
+4. Migrate the database and create a superuser when building the project for the first time.:
+
+```shell
+docker exec -it easysplit python manage.py migrate
+
+docker exec -it easysplit python manage.py createsuperuser
 ```
 
 Access the application using the appropriate domain or IP address.
